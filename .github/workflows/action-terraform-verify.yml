@@ -47,6 +47,27 @@ jobs:
               fi
             fi
           done
+      - name: Install tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/tfsec/tfsec/master/scripts/install_linux.sh | sudo bash
+
+      - name: Terraform Security Scan with tfsec
+        run: |
+          set +e
+          echo "CHECK_STATUS=0" >> $GITHUB_ENV
+
+          for changed_file in ${{ steps.pr_files.outputs.added_modified }}; do
+            if [[ $changed_file == *.tf ]]; then
+              echo "Running tfsec on ${changed_file}..."
+              tfsec $changed_file
+              TFSEC_STATUS=$(echo $?)
+
+              if [[ $TFSEC_STATUS -ne 0 ]]; then
+                echo "❌ tfsec security scan issues found - ${changed_file}" >> $GITHUB_STEP_SUMMARY
+                echo "CHECK_STATUS=1" >> $GITHUB_ENV
+              fi
+            fi
+          done
       - name: Process check
         if: always()
         run: exit $CHECK_STATUS
