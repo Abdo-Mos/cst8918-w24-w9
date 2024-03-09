@@ -47,9 +47,7 @@ jobs:
               fi
             fi
           done
-      - name: Check Terraform formatting
-        id: fmt
-        run: |
+          
           set +e # Do not exit immediately on error
           fmt_output=$(terraform fmt -check -recursive)
           if [ "$?" -ne 0 ]; then
