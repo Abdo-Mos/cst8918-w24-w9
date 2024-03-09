@@ -49,7 +49,7 @@ jobs:
           done
       - name: Install tfsec
         run: |
-          curl -s https://raw.githubusercontent.com/tfsec/tfsec/master/scripts/install_linux.sh | sudo bash
+          curl https://raw.githubusercontent.com/tfsec/tfsec/master/scripts/install_linux.sh 
 
       - name: Terraform Security Scan with tfsec
         run: |
