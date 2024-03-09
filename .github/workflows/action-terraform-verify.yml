@@ -47,12 +47,17 @@ jobs:
               fi
             fi
           done
-      - name: Update Terraform Providers and Modules
+      - name: Check for terraform.tfvars or terraform.tfvars.json files
         run: |
-          echo "Updating Terraform Providers and Modules..."
-          terraform init -upgrade
-          terraform get -update
-          echo "Providers and modules are updated."
+          set +e
+          tfvars_file_count=$(git ls-files | grep -E 'terraform\.tfvars$|terraform\.tfvars\.json$' | wc -l)
+          if [ "$tfvars_file_count" -ne 0 ]; then
+            echo "❌ Sensitive tfvars files detected. Please remove terraform.tfvars or terraform.tfvars.json files from source control."
+            exit 1
+          else
+            echo "✅ No sensitive tfvars files detected."
+          fi
+
 
       # - name: Install tfsec
       #   run: |
