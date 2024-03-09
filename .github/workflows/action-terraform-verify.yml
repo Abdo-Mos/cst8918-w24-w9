@@ -47,17 +47,18 @@ jobs:
               fi
             fi
           done
-      - name: Check for terraform.tfvars or terraform.tfvars.json files
+      - name: Check Terraform formatting
+        id: fmt
         run: |
-          set +e
-          tfvars_file_count=$(git ls-files | grep -E 'terraform\.tfvars$|terraform\.tfvars\.json$' | wc -l)
-          if [ "$tfvars_file_count" -ne 0 ]; then
-            echo "❌ Sensitive tfvars files detected. Please remove terraform.tfvars or terraform.tfvars.json files from source control."
+          set +e # Do not exit immediately on error
+          fmt_output=$(terraform fmt -check -recursive)
+          if [ "$?" -ne 0 ]; then
+            echo "::error::Terraform files need to be formatted. Run 'terraform fmt -recursive' locally to fix formatting issues."
+            echo "Formatting errors in files:"
+            echo "$fmt_output"
             exit 1
           else
-            echo "✅ No sensitive tfvars files detected."
-          fi
-
+            echo "All Terraform files are formatted correctly."
 
       # - name: Install tfsec
       #   run: |
